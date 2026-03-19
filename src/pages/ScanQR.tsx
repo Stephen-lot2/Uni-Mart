@@ -111,7 +111,7 @@ const ScanQR = () => {
   return (
     <PageTransition>
       <div className="container mx-auto max-w-md px-4 py-8">
-        <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="mb-4 gap-1">
+        <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="fixed left-4 top-20 z-40 gap-1 rounded-full bg-card/80 shadow-md backdrop-blur border">
           <ArrowLeft className="h-4 w-4" /> Back
         </Button>
 

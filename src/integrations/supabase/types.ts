@@ -221,6 +221,7 @@ export type Database = {
           id: string
           is_banned: boolean
           level: number | null
+          payment_pin: string | null
           updated_at: string
           user_id: string
           username: string
@@ -234,6 +235,7 @@ export type Database = {
           id?: string
           is_banned?: boolean
           level?: number | null
+          payment_pin?: string | null
           updated_at?: string
           user_id: string
           username: string
@@ -247,6 +249,7 @@ export type Database = {
           id?: string
           is_banned?: boolean
           level?: number | null
+          payment_pin?: string | null
           updated_at?: string
           user_id?: string
           username?: string

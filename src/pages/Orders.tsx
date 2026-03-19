@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link, useNavigate } from "react-router-dom";
 import { ShoppingBag, Package, QrCode, Clock } from "lucide-react";
+import { SkeletonRows } from "@/components/PageLoader";
 
 const statusColors: Record<string, string> = {
   pending: "bg-muted text-muted-foreground",
@@ -100,17 +101,7 @@ const Orders = () => {
     </Card>
   );
 
-  const SkeletonCards = () => (
-    <div className="space-y-3">
-      {[1, 2, 3].map(i => (
-        <Card key={i}><CardContent className="flex items-center gap-4 p-4">
-          <Skeleton className="h-16 w-16 rounded-lg" />
-          <div className="flex-1 space-y-2"><Skeleton className="h-4 w-32" /><Skeleton className="h-5 w-20" /><Skeleton className="h-3 w-24" /></div>
-          <Skeleton className="h-6 w-16 rounded-full" />
-        </CardContent></Card>
-      ))}
-    </div>
-  );
+  const SkeletonCards = () => <SkeletonRows count={3} />;
 
   return (
     <PageTransition>

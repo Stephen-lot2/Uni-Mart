@@ -62,8 +62,6 @@ export function ListingCard({
             <h3 className="line-clamp-1 font-display text-[15px] font-semibold text-foreground pr-10 tracking-tight">{title}</h3>
             <div className="mt-1 flex items-center gap-2">
               <span className="text-base font-bold text-foreground">₦{price.toLocaleString()}</span>
-              {/* Simulated struck-through old price to match mockup feel */}
-              <span className="text-xs text-muted-foreground line-through">₦{(price * 1.2).toLocaleString()}</span>
             </div>
             {(sellerName || location) && (
               <div className="mt-2 flex items-center gap-2 text-[11px] text-muted-foreground">

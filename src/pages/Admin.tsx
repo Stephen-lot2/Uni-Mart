@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthStore } from "@/lib/store";
@@ -18,6 +19,27 @@ const CHART_COLORS = ["hsl(120, 56%, 20%)", "hsl(45, 100%, 48%)", "hsl(120, 30%,
 const Admin = () => {
   const { user } = useAuthStore();
   const navigate = useNavigate();
+
+  // Role check — redirect non-admins
+  const { data: isAdmin, isLoading: roleLoading } = useQuery({
+    queryKey: ["is-admin", user?.id],
+    queryFn: async () => {
+      if (!user) return false;
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+      return !!data;
+    },
+    enabled: !!user,
+  });
+
+  useEffect(() => {
+    if (!user) { navigate("/login"); return; }
+    if (!roleLoading && isAdmin === false) { navigate("/"); }
+  }, [user, isAdmin, roleLoading, navigate]);
 
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ["admin-stats"],
@@ -98,9 +120,31 @@ const Admin = () => {
 
   const handleWithdrawalAction = async (id: string, action: "approved" | "rejected") => {
     const { error } = await supabase.from("withdrawal_requests").update({ status: action as any }).eq("id", id);
-    if (error) toast.error("Failed");
-    else { toast.success(`Withdrawal ${action}`); refetchWithdrawals(); }
+    if (error) { toast.error("Failed"); return; }
+
+    // Deduct balance from wallet when approved
+    if (action === "approved") {
+      const request = withdrawalRequests?.find((w: any) => w.id === id);
+      if (request) {
+        const { data: walletData } = await supabase
+          .from("seller_wallets")
+          .select("balance")
+          .eq("user_id", request.user_id)
+          .single();
+        if (walletData) {
+          await supabase
+            .from("seller_wallets")
+            .update({ balance: Math.max(0, Number(walletData.balance) - Number(request.amount)) })
+            .eq("user_id", request.user_id);
+        }
+      }
+    }
+
+    toast.success(`Withdrawal ${action}`);
+    refetchWithdrawals();
   };
+
+  if (!user || roleLoading || !isAdmin) return null;
 
   const barChartData = [
     { name: "Users", value: stats?.users || 0 },

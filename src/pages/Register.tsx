@@ -56,7 +56,7 @@ const Register = () => {
       <div className="w-full max-w-sm">
         <div className="text-center">
           <h1 className="font-display text-3xl font-bold">Join UniMart</h1>
-          <p className="mt-1 text-muted-foreground">Create your FUNAAB marketplace account</p>
+          <p className="mt-1 text-muted-foreground">Create your campus marketplace account</p>
         </div>
         <form onSubmit={handleRegister} className="mt-8 space-y-4">
           <div>
@@ -84,7 +84,7 @@ const Register = () => {
             <Input
               id="email"
               type="email"
-              placeholder="you@student.funaab.edu.ng"
+              placeholder="you@student.edu.ng"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
               required

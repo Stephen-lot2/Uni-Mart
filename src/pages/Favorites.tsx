@@ -5,6 +5,7 @@ import { ListingCard } from "@/components/ListingCard";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Heart } from "lucide-react";
+import { SkeletonGrid } from "@/components/PageLoader";
 
 const Favorites = () => {
   const { user } = useAuthStore();
@@ -39,8 +40,8 @@ const Favorites = () => {
       <p className="mt-1 text-muted-foreground">Items you've saved for later</p>
 
       {isLoading ? (
-        <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => <div key={i} className="aspect-square animate-pulse rounded-xl bg-muted" />)}
+        <div className="mt-8">
+          <SkeletonGrid count={8} />
         </div>
       ) : favorites && favorites.length > 0 ? (
         <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">

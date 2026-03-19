@@ -11,13 +11,21 @@ import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Heart, MessageCircle, ArrowLeft, MapPin, ShieldCheck, CreditCard } from "lucide-react";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const ListingDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuthStore();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
+  // Track recently viewed
+  useEffect(() => {
+    if (!id) return;
+    const prev: string[] = JSON.parse(localStorage.getItem("recently_viewed") || "[]");
+    const next = [id, ...prev.filter((x) => x !== id)].slice(0, 10);
+    localStorage.setItem("recently_viewed", JSON.stringify(next));
+  }, [id]);
   const [activeImage, setActiveImage] = useState(0);
 
   const { data: listing, isLoading } = useQuery({
@@ -117,7 +125,7 @@ const ListingDetail = () => {
   return (
     <PageTransition>
       <div className="container mx-auto px-4 py-8">
-        <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="mb-4 gap-1"><ArrowLeft className="h-4 w-4" /> Back</Button>
+        <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="fixed left-4 top-20 z-40 gap-1 rounded-full bg-card/80 shadow-md backdrop-blur border"><ArrowLeft className="h-4 w-4" /> Back</Button>
         <div className="grid gap-8 md:grid-cols-2">
           <div className="space-y-3">
             <div className="aspect-square overflow-hidden rounded-xl bg-muted">

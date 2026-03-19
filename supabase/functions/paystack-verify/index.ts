@@ -13,25 +13,16 @@ serve(async (req) => {
 
   try {
     const PAYSTACK_SECRET_KEY = Deno.env.get("PAYSTACK_SECRET_KEY");
-    if (!PAYSTACK_SECRET_KEY) {
-      throw new Error("PAYSTACK_SECRET_KEY is not configured");
-    }
+    if (!PAYSTACK_SECRET_KEY) throw new Error("PAYSTACK_SECRET_KEY is not configured");
 
     const { reference } = await req.json();
+    if (!reference) throw new Error("Missing reference");
 
-    if (!reference) {
-      throw new Error("Missing reference");
-    }
-
-    // Verify with Paystack
     const response = await fetch(`https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`, {
-      headers: {
-        Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
-      },
+      headers: { Authorization: `Bearer ${PAYSTACK_SECRET_KEY}` },
     });
 
     const data = await response.json();
-
     if (!response.ok || !data.status || data.data.status !== "success") {
       return new Response(
         JSON.stringify({ success: false, message: "Payment verification failed" }),
@@ -39,34 +30,52 @@ serve(async (req) => {
       );
     }
 
-    // Extract order ID from metadata
-    const orderId = data.data.metadata?.order_id || 
-      data.data.metadata?.custom_fields?.find((f: any) => f.variable_name === "order_id")?.value;
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
 
-    if (!orderId) {
-      throw new Error("Order ID not found in payment metadata");
+    const metadata = data.data.metadata || {};
+    const amountNaira = data.data.amount / 100;
+
+    // Wallet deposit
+    if (metadata.type === "wallet_deposit" && metadata.user_id) {
+      const { data: wallet, error: fetchErr } = await supabase
+        .from("seller_wallets")
+        .select("balance")
+        .eq("user_id", metadata.user_id)
+        .single();
+
+      if (fetchErr) throw new Error("Wallet not found");
+
+      const { error } = await supabase
+        .from("seller_wallets")
+        .update({ balance: Number(wallet.balance) + amountNaira })
+        .eq("user_id", metadata.user_id);
+
+      if (error) throw new Error("Failed to credit wallet");
+
+      return new Response(
+        JSON.stringify({ success: true, type: "deposit", amount: amountNaira }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
-    // Update order status to paid
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    // Order payment
+    const orderId = metadata.order_id ||
+      metadata.custom_fields?.find((f: any) => f.variable_name === "order_id")?.value;
+
+    if (!orderId) throw new Error("Order ID not found in payment metadata");
 
     const { error } = await supabase
       .from("orders")
-      .update({
-        status: "paid",
-        payment_reference: reference,
-      })
+      .update({ status: "paid", payment_reference: reference })
       .eq("id", orderId);
 
-    if (error) {
-      console.error("Order update error:", error);
-      throw new Error("Failed to update order status");
-    }
+    if (error) throw new Error("Failed to update order status");
 
     return new Response(
-      JSON.stringify({ success: true, order_id: orderId }),
+      JSON.stringify({ success: true, type: "order", order_id: orderId }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: any) {
