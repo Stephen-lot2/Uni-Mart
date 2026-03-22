@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Heart } from "lucide-react";
 import { SkeletonGrid } from "@/components/PageLoader";
+import { PageTransition } from "@/components/PageTransition";
 
 const Favorites = () => {
   const { user } = useAuthStore();
@@ -32,6 +33,7 @@ const Favorites = () => {
   });
 
   return (
+    <PageTransition>
     <div className="container mx-auto px-4 py-8">
       <div className="flex items-center gap-2">
         <Heart className="h-6 w-6 text-destructive" />
@@ -58,6 +60,7 @@ const Favorites = () => {
         </div>
       )}
     </div>
+    </PageTransition>
   );
 };
 

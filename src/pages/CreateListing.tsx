@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuthStore } from "@/lib/store";
 import { CATEGORIES, CONDITIONS } from "@/lib/constants";
 import { compressToBase64 } from "@/lib/imageUpload";
+import { PageTransition } from "@/components/PageTransition";
 import { toast } from "sonner";
 import { ImagePlus, X, Loader2 } from "lucide-react";
 
@@ -83,6 +84,7 @@ const CreateListing = () => {
   if (!user) { navigate("/login"); return null; }
 
   return (
+    <PageTransition>
     <div className="container mx-auto max-w-lg px-4 py-8">
       <h1 className="font-display text-3xl font-bold">Create Listing</h1>
       <p className="mt-1 text-muted-foreground">Post an item or service for sale</p>
@@ -183,6 +185,7 @@ const CreateListing = () => {
         </Button>
       </form>
     </div>
+    </PageTransition>
   );
 };
 

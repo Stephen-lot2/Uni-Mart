@@ -7,27 +7,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { DEPARTMENTS, LEVELS } from "@/lib/constants";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Mail, CheckCircle2 } from "lucide-react";
 
 const Register = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({
-    email: "",
-    password: "",
-    username: "",
-    fullName: "",
-    department: "",
-    level: "",
+    email: "", password: "", username: "", fullName: "", department: "", level: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (form.password.length < 6) {
-      toast.error("Password must be at least 6 characters");
-      return;
-    }
+    if (form.password.length < 6) { toast.error("Password must be at least 6 characters"); return; }
     setLoading(true);
     const { error } = await supabase.auth.signUp({
       email: form.email,
@@ -46,10 +39,48 @@ const Register = () => {
     if (error) {
       toast.error(error.message);
     } else {
-      toast.success("Account created! Check your email to confirm.");
-      navigate("/login");
+      setEmailSent(true);
     }
   };
+
+  /* ── Email sent confirmation screen ── */
+  if (emailSent) {
+    return (
+      <div className="flex min-h-screen items-center justify-center px-4">
+        <div className="w-full max-w-sm text-center">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
+            <Mail className="h-10 w-10 text-primary" />
+          </div>
+          <div className="mt-5 flex items-center justify-center gap-2">
+            <CheckCircle2 className="h-5 w-5 text-primary" />
+            <h2 className="font-display text-2xl font-bold">Check your email</h2>
+          </div>
+          <p className="mt-3 text-muted-foreground">
+            We sent a confirmation link to
+          </p>
+          <p className="mt-1 font-semibold text-foreground break-all">{form.email}</p>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Click the link in the email to activate your account, then come back and log in.
+          </p>
+          <div className="mt-6 space-y-3">
+            <Button className="w-full" onClick={() => navigate("/login")}>
+              Go to Login
+            </Button>
+            <button
+              className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors"
+              onClick={async () => {
+                const { error } = await supabase.auth.resend({ type: "signup", email: form.email });
+                if (error) toast.error(error.message);
+                else toast.success("Confirmation email resent!");
+              }}
+            >
+              Didn't receive it? Resend email
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-8">

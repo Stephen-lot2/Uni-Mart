@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PageTransition } from "@/components/PageTransition";
 import { CATEGORIES } from "@/lib/constants";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthStore } from "@/lib/store";
 import { motion, AnimatePresence } from "framer-motion";
@@ -154,6 +154,7 @@ const Marketplace = () => {
   /* main listing query */
   const { data, isLoading } = useQuery({
     queryKey: ["marketplace", search, category, condition, sortBy, priceRange, page],
+    placeholderData: keepPreviousData,
     queryFn: async () => {
       let q = supabase.from("listings").select("*", { count: "exact" }).eq("is_active", true);
       if (search) q = q.ilike("title", `%${search}%`);

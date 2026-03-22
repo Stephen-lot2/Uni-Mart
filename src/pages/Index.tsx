@@ -6,7 +6,7 @@ import { PageTransition } from "@/components/PageTransition";
 import { CATEGORIES } from "@/lib/constants";
 import { ArrowRight, Heart, ShoppingBag, Star, Zap, ShieldCheck, Users, TrendingUp, Package } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthStore } from "@/lib/store";
 
@@ -14,14 +14,14 @@ import { useAuthStore } from "@/lib/store";
 const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 28 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] },
+  transition: { duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] as any },
 });
 
 const stagger = (i: number) => ({
   initial: { opacity: 0, y: 20 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true },
-  transition: { duration: 0.45, delay: i * 0.07, ease: [0.22, 1, 0.36, 1] },
+  transition: { duration: 0.45, delay: i * 0.07, ease: [0.22, 1, 0.36, 1] as any },
 });
 
 /* ─── Product Card (homepage style) ─── */
@@ -161,6 +161,7 @@ const Index = () => {
   /* all active listings for grid */
   const { data: listings, isLoading } = useQuery({
     queryKey: ["home-listings", activeCategory],
+    placeholderData: keepPreviousData,
     queryFn: async () => {
       let q = supabase.from("listings").select("*").eq("is_active", true).order("created_at", { ascending: false }).limit(12);
       if (activeCategory !== "all") q = q.eq("category", activeCategory as any);

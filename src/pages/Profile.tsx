@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { Pencil, Camera, Calendar, Loader2, Trash2 } from "lucide-react";
 import { compressAvatarToBase64 } from "@/lib/imageUpload";
 import { ProfileSkeleton } from "@/components/PageLoader";
+import { PageTransition } from "@/components/PageTransition";
 
 const Profile = () => {
   const { userId } = useParams<{ userId: string }>();
@@ -172,6 +173,7 @@ const Profile = () => {
   }
 
   return (
+    <PageTransition>
     <div className="container mx-auto px-4 py-8">
       <div className="mx-auto max-w-5xl">
         {/* Profile Header */}
@@ -335,6 +337,7 @@ const Profile = () => {
         </div>
       </div>
     </div>
+    </PageTransition>
   );
 };
 

@@ -74,7 +74,7 @@ export function Navbar() {
       return count || 0;
     },
     enabled: !!user,
-    refetchInterval: 15000,
+    refetchInterval: 30000,
   });
 
   const handleLogout = async () => {

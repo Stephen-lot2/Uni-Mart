@@ -125,7 +125,9 @@ const ListingDetail = () => {
   return (
     <PageTransition>
       <div className="container mx-auto px-4 py-8">
-        <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="fixed left-4 top-20 z-40 gap-1 rounded-full bg-card/80 shadow-md backdrop-blur border"><ArrowLeft className="h-4 w-4" /> Back</Button>
+        <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="fixed left-4 top-4 z-40 rounded-full bg-card/80 shadow-md backdrop-blur border">
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
         <div className="grid gap-8 md:grid-cols-2">
           <div className="space-y-3">
             <div className="aspect-square overflow-hidden rounded-xl bg-muted">
