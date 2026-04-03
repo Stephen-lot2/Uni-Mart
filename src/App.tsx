@@ -105,7 +105,8 @@ function AppRoutes() {
   }
 
   if (!user && !isAuthPage) return <Navigate to="/login" replace />;
-  if (user && isAuthPage) return <Navigate to="/" replace />;
+  // Don't redirect away from /register — user may be mid-onboarding after OTP magic link
+  if (user && isAuthPage && location.pathname !== "/register") return <Navigate to="/" replace />;
 
   return (
     <>

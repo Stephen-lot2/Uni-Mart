@@ -190,13 +190,13 @@ const Index = () => {
       <div className="min-h-screen pb-20 md:pb-0">
 
         {/* ── HERO ── */}
-        <section className="relative overflow-hidden px-5 pt-8 pb-10 md:px-12 md:pt-12">
+        <section className="relative overflow-hidden px-5 pt-8 pb-10 md:px-12 md:pt-16 xl:px-20 xl:pt-20">
           {/* bg blobs */}
-          <div className="pointer-events-none absolute -right-40 -top-40 h-[500px] w-[500px] rounded-full bg-primary/8 blur-3xl" />
-          <div className="pointer-events-none absolute -left-20 bottom-0 h-64 w-64 rounded-full bg-secondary/15 blur-3xl" />
+          <div className="pointer-events-none absolute -right-40 -top-40 h-[700px] w-[700px] rounded-full bg-primary/8 blur-3xl" />
+          <div className="pointer-events-none absolute -left-20 bottom-0 h-80 w-80 rounded-full bg-secondary/15 blur-3xl" />
 
-          <div className="relative mx-auto max-w-6xl">
-            <div className="grid gap-8 md:grid-cols-2 md:items-center">
+          <div className="relative mx-auto max-w-[1400px]">
+            <div className="grid gap-8 md:grid-cols-2 md:items-center xl:gap-16">
 
               {/* left text */}
               <div>
@@ -206,39 +206,39 @@ const Index = () => {
                   </span>
                 </motion.div>
 
-                <motion.h1 {...fadeUp(0.1)} className="mt-5 font-display text-[2.6rem] font-black leading-[1.05] tracking-tight text-foreground md:text-6xl">
+                <motion.h1 {...fadeUp(0.1)} className="mt-5 font-display text-[2.6rem] font-black leading-[1.05] tracking-tight text-foreground md:text-6xl xl:text-7xl">
                   Shop Smart.<br />
                   <span className="text-primary">Buy Local.</span><br />
-                  <span className="text-muted-foreground text-3xl font-semibold md:text-4xl">On Campus.</span>
+                  <span className="text-muted-foreground text-3xl font-semibold md:text-4xl xl:text-5xl">On Campus.</span>
                 </motion.h1>
 
-                <motion.p {...fadeUp(0.2)} className="mt-4 max-w-sm text-base text-muted-foreground">
+                <motion.p {...fadeUp(0.2)} className="mt-4 max-w-sm text-base text-muted-foreground xl:text-lg xl:max-w-md">
                   The student marketplace for gadgets, books, fashion, food and more — all within your campus.
                 </motion.p>
 
                 <motion.div {...fadeUp(0.3)} className="mt-7 flex flex-wrap gap-3">
                   <Link to="/marketplace">
-                    <Button size="lg" className="h-12 gap-2 rounded-2xl px-8 text-base font-bold shadow-lg shadow-primary/25">
+                    <Button size="lg" className="h-12 gap-2 rounded-2xl px-8 text-base font-bold shadow-lg shadow-primary/25 xl:h-14 xl:px-10 xl:text-lg">
                       Shop Now <ArrowRight className="h-4 w-4" />
                     </Button>
                   </Link>
                   <Link to="/create-listing">
-                    <Button size="lg" variant="outline" className="h-12 gap-2 rounded-2xl px-8 text-base">
+                    <Button size="lg" variant="outline" className="h-12 gap-2 rounded-2xl px-8 text-base xl:h-14 xl:px-10 xl:text-lg">
                       Sell an Item
                     </Button>
                   </Link>
                 </motion.div>
 
                 {/* stats row */}
-                <motion.div {...fadeUp(0.4)} className="mt-8 flex gap-8">
+                <motion.div {...fadeUp(0.4)} className="mt-8 flex gap-8 xl:gap-12">
                   {[
                     { value: "500+", label: "Students" },
                     { value: "1.2k+", label: "Listings" },
                     { value: "4.9★", label: "Rating" },
                   ].map((s) => (
                     <div key={s.label}>
-                      <p className="font-display text-2xl font-black text-foreground">{s.value}</p>
-                      <p className="text-xs text-muted-foreground">{s.label}</p>
+                      <p className="font-display text-2xl font-black text-foreground xl:text-3xl">{s.value}</p>
+                      <p className="text-xs text-muted-foreground xl:text-sm">{s.label}</p>
                     </div>
                   ))}
                 </motion.div>
@@ -252,12 +252,11 @@ const Index = () => {
                 className="flex justify-center md:justify-end"
               >
                 {heroListing ? (
-                  <div className="w-full max-w-xs">
+                  <div className="w-full max-w-xs xl:max-w-sm">
                     <HeroProductCard listing={heroListing} />
                   </div>
                 ) : (
-                  /* placeholder card when no featured listing */
-                  <div className="w-full max-w-xs">
+                  <div className="w-full max-w-xs xl:max-w-sm">
                     <div className="relative overflow-hidden rounded-[2rem] border bg-gradient-to-br from-primary/10 via-card to-secondary/10 shadow-2xl">
                       <div className="flex aspect-[3/4] flex-col items-center justify-center gap-4 p-8">
                         <div className="text-8xl">🛍️</div>
@@ -285,8 +284,8 @@ const Index = () => {
         </section>
 
         {/* ── SPECIAL DEALS ── */}
-        <section className="px-5 py-6 md:px-12">
-          <div className="mx-auto max-w-6xl grid gap-4 sm:grid-cols-2">
+        <section className="px-5 py-6 md:px-12 xl:px-20">
+          <div className="mx-auto max-w-[1400px] grid gap-4 sm:grid-cols-2">
             <motion.div
               {...stagger(0)}
               className="group relative flex items-center justify-between overflow-hidden rounded-3xl bg-gradient-to-r from-primary to-primary/70 p-6 shadow-lg cursor-pointer"
@@ -324,8 +323,8 @@ const Index = () => {
         </section>
 
         {/* ── CATEGORY FILTER BAR ── */}
-        <section className="px-5 py-6 md:px-12">
-          <div className="mx-auto max-w-6xl">
+        <section className="px-5 py-6 md:px-12 xl:px-20">
+          <div className="mx-auto max-w-[1400px]">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-display text-xl font-bold">Browse by Category</h2>
               <Link to="/marketplace" className="text-xs text-primary font-semibold flex items-center gap-1 hover:underline">
@@ -361,11 +360,11 @@ const Index = () => {
         </section>
 
         {/* ── PRODUCT GRID ── */}
-        <section className="px-5 pb-10 md:px-12">
-          <div className="mx-auto max-w-6xl">
+        <section className="px-5 pb-10 md:px-12 xl:px-20">
+          <div className="mx-auto max-w-[1400px]">
             <div className="flex items-center justify-between mb-5">
               <div>
-                <h2 className="font-display text-2xl font-bold">
+                <h2 className="font-display text-2xl font-bold xl:text-3xl">
                   {activeCategory === "all" ? "All Products" : CATEGORIES.find(c => c.value === activeCategory)?.label}
                 </h2>
                 <p className="text-xs text-muted-foreground mt-0.5">
@@ -380,13 +379,13 @@ const Index = () => {
             </div>
 
             {isLoading ? (
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
                 {Array.from({ length: 8 }).map((_, i) => (
                   <div key={i} className="rounded-3xl bg-muted/40 animate-pulse aspect-[3/4]" />
                 ))}
               </div>
             ) : listings && listings.length > 0 ? (
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
                 {listings.map((listing: any) => (
                   <ProductCard key={listing.id} listing={listing} wishlist={wishlist} onWishlist={toggleWishlist} />
                 ))}

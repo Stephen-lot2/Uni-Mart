@@ -110,8 +110,8 @@ export function Navbar() {
   );
 
   return (
-    <nav ref={navRef} className="fixed top-0 left-0 right-0 z-50 border-b bg-background/95 backdrop-blur-xl supports-[backdrop-filter]:bg-background/80">
-      <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-6">
+    <nav ref={navRef} className="fixed top-0 left-0 right-0 z-50 border-b bg-background/90 backdrop-blur-2xl supports-[backdrop-filter]:bg-background/75">
+      <div className="mx-auto flex h-16 max-w-[1600px] items-center gap-4 px-6 xl:px-10">
 
         {/* Logo */}
         <Link to="/" className="flex shrink-0 items-center gap-2.5">

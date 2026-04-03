@@ -110,7 +110,7 @@ const Checkout = () => {
 
       toast.success("Payment successful!");
       setPinOpen(false);
-      navigate(`/order-qr/${order.id}`);
+      navigate(`/order/${order.id}/qr`);
     } catch (err: any) {
       toast.error(err.message || "Payment failed");
     }
