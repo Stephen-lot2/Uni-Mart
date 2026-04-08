@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingBag, Package, QrCode, Clock } from "lucide-react";
+import { ShoppingBag, Package, QrCode, Clock, ArrowLeft } from "lucide-react";
 import { SkeletonRows } from "@/components/PageLoader";
 
 const statusColors: Record<string, string> = {
@@ -106,11 +106,15 @@ const Orders = () => {
   return (
     <PageTransition>
       <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center gap-2">
-          <ShoppingBag className="h-6 w-6 text-primary" />
-          <h1 className="font-display text-3xl font-bold">My Orders</h1>
+        <div className="flex items-center gap-3">
+          <button onClick={() => navigate(-1)} className="flex h-9 w-9 items-center justify-center rounded-full border bg-card shadow-sm hover:bg-muted transition-colors">
+            <ArrowLeft className="h-4 w-4" />
+          </button>
+          <div>
+            <h1 className="font-display text-2xl font-bold">My Orders</h1>
+            <p className="text-sm text-muted-foreground">Track your purchases and sales</p>
+          </div>
         </div>
-        <p className="mt-1 text-muted-foreground">Track your purchases and sales</p>
 
         <Tabs defaultValue="purchases" className="mt-6">
           <TabsList className="grid w-full grid-cols-2">

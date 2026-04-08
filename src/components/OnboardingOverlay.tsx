@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 const slides = [
   {
     id: "welcome",
-    title: "Welcome to UniMart",
+    title: "Welcome to CampusMart",
     subtitle: "Your all-in-one campus companion",
     content: (
       <div className="relative w-full max-w-[240px] mx-auto aspect-[1/1.8] rounded-[2.5rem] border-[8px] border-border/50 bg-card/80 backdrop-blur-xl shadow-2xl overflow-hidden flex flex-col items-center justify-center p-6 before:absolute before:top-2 before:w-20 before:h-5 before:bg-border/50 before:rounded-full before:z-20">
@@ -314,3 +314,4 @@ export const OnboardingOverlay = () => {
     </AnimatePresence>
   );
 };
+

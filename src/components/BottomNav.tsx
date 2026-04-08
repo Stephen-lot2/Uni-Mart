@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthStore } from "@/lib/store";
+import { prefetchRoute } from "@/App";
 
 export function BottomNav() {
   const location = useLocation();
@@ -26,15 +27,15 @@ export function BottomNav() {
   });
 
   const navItems = [
-    { icon: Home,          label: "Home",    path: "/",           badge: 0 },
-    { icon: Store,         label: "Market",  path: "/marketplace",badge: 0 },
-    { icon: Heart,         label: "Saved",   path: "/favorites",  badge: 0 },
-    { icon: MessageCircle, label: "Chat",    path: "/chat",       badge: unreadCount },
-    { icon: User,          label: "Profile", path: "/profile",    badge: 0 },
+    { icon: Home,          label: "Home",    path: "/",            badge: 0, prefetch: null },
+    { icon: Store,         label: "Market",  path: "/marketplace", badge: 0, prefetch: prefetchRoute.marketplace },
+    { icon: Heart,         label: "Saved",   path: "/favorites",   badge: 0, prefetch: prefetchRoute.favorites },
+    { icon: MessageCircle, label: "Chat",    path: "/chat",        badge: unreadCount, prefetch: prefetchRoute.chat },
+    { icon: User,          label: "Profile", path: "/profile",     badge: 0, prefetch: prefetchRoute.profile },
   ];
 
   return (
-    <div className="fixed bottom-4 left-0 right-0 z-50 flex justify-center md:hidden px-4">
+    <div className="fixed bottom-2 left-0 right-0 z-50 flex justify-center md:hidden px-4">
       <motion.div
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -51,6 +52,8 @@ export function BottomNav() {
             <Link
               key={item.label}
               to={item.path}
+              onMouseEnter={() => item.prefetch?.()}
+              onTouchStart={() => item.prefetch?.()}
               className={`flex flex-col items-center gap-1 transition-colors ${
                 isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
               }`}

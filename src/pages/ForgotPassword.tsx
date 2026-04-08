@@ -55,7 +55,7 @@ const ForgotPassword = () => {
             </div>
           </div>
           <div className="text-center">
-            <h1 className="font-display text-3xl font-black tracking-tight">UniMart</h1>
+            <h1 className="font-display text-3xl font-black tracking-tight">CampusMart</h1>
             <p className="text-sm text-muted-foreground">Your campus, your marketplace</p>
           </div>
         </div>
@@ -129,3 +129,4 @@ const ForgotPassword = () => {
 };
 
 export default ForgotPassword;
+

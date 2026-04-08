@@ -10,9 +10,9 @@ export function Footer() {
           <div className="md:col-span-2">
             <Link to="/" className="flex items-center gap-2.5">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary shadow-md shadow-primary/30">
-                <span className="font-display text-lg font-black text-primary-foreground">U</span>
+              <span className="font-display text-lg font-black text-primary-foreground">C</span>
               </div>
-              <span className="font-display text-xl font-black tracking-tight">UniMart</span>
+              <span className="font-display text-xl font-black tracking-tight">CampusMart</span>
             </Link>
             <p className="mt-3 max-w-xs text-sm text-muted-foreground leading-relaxed">
               The trusted campus marketplace. Buy, sell, and connect within your campus community.
@@ -68,10 +68,11 @@ export function Footer() {
         </div>
 
         <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t pt-6 text-xs text-muted-foreground md:flex-row">
-          <p>© {new Date().getFullYear()} UniMart. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} CampusMart. All rights reserved.</p>
           <p>Made with ❤️ for students</p>
         </div>
       </div>
     </footer>
   );
 }
+

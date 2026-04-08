@@ -13,6 +13,8 @@ import { BottomNav } from "@/components/BottomNav";
 import { RouteProgressBar, PageLoader } from "@/components/PageLoader";
 import { useNotifications } from "@/hooks/useNotifications";
 import { SplashScreen } from "@/components/SplashScreen";
+import { InstallPrompt } from "@/components/InstallPrompt";
+import { AIAssistant } from "@/components/AIAssistant";
 
 function NotificationManager() {
   useNotifications();
@@ -43,14 +45,31 @@ const Wallet          = lazy(() => import("./pages/Wallet"));
 const Settings        = lazy(() => import("./pages/Settings"));
 const NotFound        = lazy(() => import("./pages/NotFound"));
 
+// Prefetch helpers — call on link hover so chunk is ready before click
+export const prefetchRoute = {
+  marketplace:  () => import("./pages/Marketplace"),
+  listing:      () => import("./pages/ListingDetail"),
+  profile:      () => import("./pages/Profile"),
+  chat:         () => import("./pages/Chat"),
+  orders:       () => import("./pages/Orders"),
+  wallet:       () => import("./pages/Wallet"),
+  settings:     () => import("./pages/Settings"),
+  favorites:    () => import("./pages/Favorites"),
+  createListing:() => import("./pages/CreateListing"),
+};
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
+      // Data considered fresh for 10 min — no refetch on every navigation
       staleTime: 1000 * 60 * 10,
+      // Keep unused data in memory for 1 hour
       gcTime: 1000 * 60 * 60,
       refetchOnWindowFocus: false,
       refetchOnReconnect: true,
       retry: 1,
+      // Show cached data immediately while revalidating in background
+      refetchOnMount: true,
     },
   },
 });
@@ -153,18 +172,21 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
         <BrowserRouter>
           <AuthProvider>
             <NotificationManager />
             <OnboardingOverlay />
+            <InstallPrompt />
             <div className="flex min-h-screen flex-col bg-background text-foreground">
               <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(60%_50%_at_20%_10%,hsl(var(--gold-light)/0.25)_0%,transparent_55%),radial-gradient(60%_50%_at_80%_0%,hsl(var(--primary)/0.18)_0%,transparent_60%),radial-gradient(60%_60%_at_50%_100%,hsl(var(--primary)/0.10)_0%,transparent_60%)] dark:bg-[radial-gradient(60%_50%_at_20%_10%,hsl(var(--primary)/0.18)_0%,transparent_55%),radial-gradient(60%_50%_at_80%_0%,hsl(var(--gold)/0.18)_0%,transparent_60%),radial-gradient(60%_60%_at_50%_100%,hsl(var(--gold)/0.10)_0%,transparent_60%)]" />
               <div className="pointer-events-none fixed inset-0 -z-10 bg-[linear-gradient(to_bottom,transparent_0%,hsl(var(--background))_65%)]" />
               <AppRoutes />
+              <AIAssistant />
             </div>
           </AuthProvider>
         </BrowserRouter>
+        {/* Splash renders on top but app loads underneath — no blocking */}
+        {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
       </TooltipProvider>
     </QueryClientProvider>
   );

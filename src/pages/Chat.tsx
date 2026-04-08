@@ -64,7 +64,7 @@ const Chat = () => {
     const ext = type === "video" ? "mp4" : "jpg";
     const a = document.createElement("a");
     a.href = src;
-    a.download = `unimart-media-${Date.now()}.${ext}`;
+    a.download = `CampusMart-media-${Date.now()}.${ext}`;
     a.click();
   };
   // Audio playback
@@ -343,6 +343,17 @@ const Chat = () => {
           </button>
           <div className="flex-1 h-1 rounded-full bg-current opacity-30" />
           <span className="text-[11px] opacity-70">Voice</span>
+        </div>
+      );
+    }
+    // Offer message
+    if (c.startsWith("[offer]") && c.endsWith("[/offer]")) {
+      const text = c.slice(7, -8);
+      return (
+        <div className={cn("rounded-xl p-3 text-sm min-w-[180px]", isMine ? "bg-white/10" : "bg-primary/10 border border-primary/20")}>
+          {text.split("\n").map((line, i) => (
+            <p key={i} className={i === 0 ? "font-bold" : "mt-1 text-xs opacity-80"}>{line}</p>
+          ))}
         </div>
       );
     }
@@ -696,7 +707,7 @@ const Chat = () => {
               <MessageCircle className="h-12 w-12 text-primary opacity-60" />
             </div>
             <div className="text-center">
-              <p className="text-lg font-semibold text-foreground">UniMart Chats</p>
+              <p className="text-lg font-semibold text-foreground">CampusMart Chats</p>
               <p className="mt-1 text-sm text-muted-foreground">Select a conversation to start messaging</p>
             </div>
           </div>
@@ -707,3 +718,4 @@ const Chat = () => {
 };
 
 export default Chat;
+

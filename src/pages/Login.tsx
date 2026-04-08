@@ -69,11 +69,11 @@ const Login = () => {
           <div className="relative">
             <div className="absolute inset-0 rounded-3xl bg-primary blur-xl opacity-40" />
             <div className="relative flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-primary to-primary/70 shadow-2xl shadow-primary/40">
-              <span className="font-display text-4xl font-black text-primary-foreground">U</span>
+              <span className="font-display text-4xl font-black text-primary-foreground">C</span>
             </div>
           </div>
           <div className="text-center">
-            <h1 className="font-display text-3xl font-black tracking-tight text-foreground">UniMart</h1>
+            <h1 className="font-display text-3xl font-black tracking-tight text-foreground">CampusMart</h1>
             <p className="text-sm text-muted-foreground">Your campus, your marketplace</p>
           </div>
         </div>
@@ -167,7 +167,7 @@ const Login = () => {
 
             <div className="my-4 flex items-center gap-3">
               <div className="h-px flex-1 bg-border/50" />
-              <span className="text-xs text-muted-foreground">New to UniMart?</span>
+              <span className="text-xs text-muted-foreground">New to CampusMart?</span>
               <div className="h-px flex-1 bg-border/50" />
             </div>
 
@@ -180,7 +180,7 @@ const Login = () => {
         </div>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          By continuing, you agree to UniMart's{" "}
+          By continuing, you agree to CampusMart's{" "}
           <span className="text-primary cursor-pointer hover:underline">Terms</span> &{" "}
           <span className="text-primary cursor-pointer hover:underline">Privacy Policy</span>
         </p>
@@ -190,3 +190,4 @@ const Login = () => {
 };
 
 export default Login;
+

@@ -3,12 +3,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthStore } from "@/lib/store";
 
-/**
- * Requests browser push permission once, then subscribes to realtime
- * new messages. When a message arrives for the current user (they are
- * NOT the sender and the app is NOT focused), fires a Web Notification.
- * Also invalidates the unread-count query so BottomNav badge updates.
- */
 export function useNotifications() {
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
@@ -24,80 +18,158 @@ export function useNotifications() {
     }
   }, [user]);
 
-  // Subscribe to ALL new messages where the current user is a participant
+  // ── New messages ──
   useEffect(() => {
     if (!user) return;
 
     const channel = supabase
       .channel(`user-notifications-${user.id}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "messages",
-        },
-        async (payload) => {
-          const msg = payload.new as any;
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, async (payload) => {
+        const msg = payload.new as any;
+        if (msg.sender_id === user.id) return;
 
-          // Ignore messages sent by the current user
-          if (msg.sender_id === user.id) return;
+        const { data: convo } = await supabase
+          .from("conversations")
+          .select("id, participant_one, participant_two")
+          .eq("id", msg.conversation_id)
+          .or(`participant_one.eq.${user.id},participant_two.eq.${user.id}`)
+          .maybeSingle();
 
-          // Check the message belongs to a conversation the user is in
-          const { data: convo } = await supabase
-            .from("conversations")
-            .select("id, participant_one, participant_two")
-            .eq("id", msg.conversation_id)
-            .or(`participant_one.eq.${user.id},participant_two.eq.${user.id}`)
-            .maybeSingle();
+        if (!convo) return;
 
-          if (!convo) return; // not their conversation
+        queryClient.invalidateQueries({ queryKey: ["unread-count", user.id] });
+        queryClient.invalidateQueries({ queryKey: ["conversations", user.id] });
 
-          // Invalidate unread count so badge updates everywhere
-          queryClient.invalidateQueries({ queryKey: ["unread-count", user.id] });
-          queryClient.invalidateQueries({ queryKey: ["conversations", user.id] });
+        if (document.visibilityState === "visible") return;
+        if (!("Notification" in window) || Notification.permission !== "granted") return;
 
-          // Fire browser notification only when app is not focused
-          if (document.visibilityState === "visible") return;
-          if (!("Notification" in window)) return;
-          if (Notification.permission !== "granted") return;
+        const { data: sender } = await supabase
+          .from("profiles").select("full_name").eq("user_id", msg.sender_id).maybeSingle();
 
-          // Get sender name
-          const { data: sender } = await supabase
-            .from("profiles")
-            .select("full_name")
-            .eq("user_id", msg.sender_id)
-            .maybeSingle();
+        const senderName = sender?.full_name || "Someone";
+        const body = msg.content.startsWith("[img]") ? "📷 Sent you an image"
+          : msg.content.startsWith("[video]") ? "🎥 Sent you a video"
+          : msg.content.startsWith("[audio]") ? "🎤 Sent you a voice message"
+          : msg.content.startsWith("[offer]") ? "💰 Sent you an offer"
+          : msg.content.length > 80 ? msg.content.slice(0, 80) + "…"
+          : msg.content;
 
-          const senderName = sender?.full_name || "Someone";
-          const body = msg.content.startsWith("[img]")
-            ? "📷 Sent you an image"
-            : msg.content.startsWith("[video]")
-            ? "🎥 Sent you a video"
-            : msg.content.startsWith("[audio]")
-            ? "🎤 Sent you a voice message"
-            : msg.content.length > 80
-            ? msg.content.slice(0, 80) + "…"
-            : msg.content;
+        const notif = new Notification(`💬 ${senderName}`, {
+          body,
+          icon: "/favicon.png",
+          badge: "/favicon.png",
+          tag: `chat-${convo.id}`,
+        } as NotificationOptions);
 
-          const notif = new Notification(`💬 ${senderName}`, {
-            body,
-            icon: "/favicon.png",
-            badge: "/favicon.png",
-            tag: `chat-${convo.id}`, // replaces previous notif from same convo
-          } as NotificationOptions);
-
-          // Clicking the notification opens the chat
-          notif.onclick = () => {
-            window.focus();
-            window.location.href = `/chat?conversation=${convo.id}`;
-          };
-        }
-      )
+        notif.onclick = () => { window.focus(); window.location.href = `/chat?conversation=${convo.id}`; };
+      })
       .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => { supabase.removeChannel(channel); };
+  }, [user, queryClient]);
+
+  // ── Order status changes ──
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel(`order-notifications-${user.id}`)
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "orders" }, async (payload) => {
+        const order = payload.new as any;
+        const oldOrder = payload.old as any;
+
+        // Only notify the buyer or seller involved
+        const isBuyer = order.buyer_id === user.id;
+        const isSeller = order.seller_id === user.id;
+        if (!isBuyer && !isSeller) return;
+
+        // Only fire when status actually changed
+        if (order.status === oldOrder.status) return;
+
+        queryClient.invalidateQueries({ queryKey: ["orders"] });
+
+        if (document.visibilityState === "visible") return;
+        if (!("Notification" in window) || Notification.permission !== "granted") return;
+
+        const statusMessages: Record<string, { title: string; body: string }> = {
+          paid: {
+            title: "💳 Payment Received",
+            body: isSeller ? "A buyer just paid for your listing. Prepare for delivery!" : "Your payment was confirmed.",
+          },
+          delivered: {
+            title: "📦 Order Delivered",
+            body: isBuyer ? "Seller marked your order as delivered. Confirm to release payment." : "You marked the order as delivered.",
+          },
+          completed: {
+            title: "✅ Order Completed",
+            body: isSeller ? "Payment has been released to your wallet!" : "Order completed. Enjoy your item!",
+          },
+          disputed: {
+            title: "⚠️ Order Disputed",
+            body: "A dispute was raised on your order. Our team will review it.",
+          },
+          cancelled: {
+            title: "❌ Order Cancelled",
+            body: "An order has been cancelled.",
+          },
+        };
+
+        const msg = statusMessages[order.status];
+        if (!msg) return;
+
+        const notif = new Notification(msg.title, {
+          body: msg.body,
+          icon: "/favicon.png",
+          badge: "/favicon.png",
+          tag: `order-${order.id}`,
+        } as NotificationOptions);
+
+        notif.onclick = () => { window.focus(); window.location.href = `/orders`; };
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [user, queryClient]);
+
+  // ── New listing from followed sellers ──
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel(`follow-notifications-${user.id}`)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "listings" }, async (payload) => {
+        const listing = payload.new as any;
+        if (listing.seller_id === user.id) return;
+
+        const { data: follow } = await supabase
+          .from("follows")
+          .select("id")
+          .eq("follower_id", user.id)
+          .eq("following_id", listing.seller_id)
+          .maybeSingle();
+
+        if (!follow) return;
+
+        queryClient.invalidateQueries({ queryKey: ["home-listings"] });
+        queryClient.invalidateQueries({ queryKey: ["marketplace"] });
+
+        if (document.visibilityState === "visible") return;
+        if (!("Notification" in window) || Notification.permission !== "granted") return;
+
+        const { data: seller } = await supabase
+          .from("profiles").select("full_name").eq("user_id", listing.seller_id).maybeSingle();
+
+        const notif = new Notification(`🛍️ New listing from ${seller?.full_name || "someone you follow"}`, {
+          body: `${listing.title} — ₦${Number(listing.price).toLocaleString()}`,
+          icon: "/favicon.png",
+          badge: "/favicon.png",
+          tag: `new-listing-${listing.id}`,
+        } as NotificationOptions);
+
+        notif.onclick = () => { window.focus(); window.location.href = `/listing/${listing.id}`; };
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
   }, [user, queryClient]);
 }

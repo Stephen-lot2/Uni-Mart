@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { User, Lock, Bell, Trash2, LogOut, ChevronRight, Moon, Sun, Monitor, KeyRound } from "lucide-react";
+import { User, Lock, Bell, Trash2, LogOut, ChevronRight, Moon, Sun, Monitor, KeyRound, ArrowLeft } from "lucide-react";
 import { useEffect } from "react";
 
 type Theme = "light" | "dark" | "system";
@@ -99,8 +99,15 @@ const Settings = () => {
 
   return (
     <div className="container mx-auto max-w-lg px-4 py-8">
-      <h1 className="font-display text-3xl font-bold">Settings</h1>
-      <p className="mt-1 text-muted-foreground">Manage your account preferences</p>
+      <div className="flex items-center gap-3">
+        <button onClick={() => navigate(-1)} className="flex h-9 w-9 items-center justify-center rounded-full border bg-card shadow-sm hover:bg-muted transition-colors">
+          <ArrowLeft className="h-4 w-4" />
+        </button>
+        <div>
+          <h1 className="font-display text-2xl font-bold">Settings</h1>
+          <p className="text-sm text-muted-foreground">Manage your account preferences</p>
+        </div>
+      </div>
 
       <div className="mt-8 space-y-6">
         {/* Account */}

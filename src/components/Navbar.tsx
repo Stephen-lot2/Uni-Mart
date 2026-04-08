@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Menu, X, Heart, MessageCircle, Plus, User, LogOut,
-  Shield, ShoppingBag, Wallet, Settings, Search, Bell,
+  Shield, ShoppingBag, Wallet, Settings, Search, Trophy, Download,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
@@ -26,6 +26,22 @@ export function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const navRef = useRef<HTMLElement>(null);
+  const [installPrompt, setInstallPrompt] = useState<any>(null);
+  const [canInstall, setCanInstall] = useState(false);
+
+  useEffect(() => {
+    const handler = (e: any) => { e.preventDefault(); setInstallPrompt(e); setCanInstall(true); };
+    window.addEventListener("beforeinstallprompt", handler);
+    // Already installed
+    if (window.matchMedia("(display-mode: standalone)").matches) setCanInstall(false);
+    return () => window.removeEventListener("beforeinstallprompt", handler);
+  }, []);
+
+  const handleInstall = async () => {
+    if (!installPrompt) return;
+    await installPrompt.prompt();
+    setCanInstall(false);
+  };
 
   // Prefetch key pages on hover for instant navigation
   const prefetchMarketplace = () => {
@@ -117,10 +133,10 @@ export function Navbar() {
         <Link to="/" className="flex shrink-0 items-center gap-2.5">
           <div className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-primary shadow-md shadow-primary/30">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.3)_0%,transparent_60%)]" />
-            <span className="relative font-display text-lg font-black text-primary-foreground">U</span>
+            <span className="relative font-display text-lg font-black text-primary-foreground">C</span>
           </div>
           <span className="font-display text-xl font-black tracking-tight text-foreground">
-            UniMart
+            CampusMart
           </span>
         </Link>
 
@@ -138,6 +154,13 @@ export function Navbar() {
             {isActive("/marketplace") && (
               <span className="absolute -bottom-[21px] left-0 right-0 h-0.5 rounded-full bg-primary" />
             )}
+          </Link>
+          <Link
+            to="/#leaderboard"
+            onClick={e => { e.preventDefault(); document.getElementById("leaderboard")?.scrollIntoView({ behavior: "smooth" }); }}
+            className="relative flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <Trophy className="h-3.5 w-3.5 text-yellow-500" /> Leaderboard
           </Link>
         </div>
 
@@ -158,6 +181,18 @@ export function Navbar() {
         <div className="hidden items-center gap-1 md:flex ml-auto">
           {user ? (
             <>
+              {/* Install App button */}
+              {canInstall && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleInstall}
+                  className="gap-1.5 rounded-full px-4 font-semibold border-primary/40 text-primary hover:bg-primary/5"
+                >
+                  <Download className="h-3.5 w-3.5" /> Install App
+                </Button>
+              )}
+
               {/* Sell button */}
               <Link to="/create-listing">
                 <Button size="sm" className="gap-1.5 rounded-full px-4 font-semibold shadow-sm shadow-primary/20">
@@ -251,7 +286,7 @@ export function Navbar() {
           )}
         </div>
 
-        {/* Mobile: search + hamburger */}
+        {/* Mobile: search + avatar + hamburger */}
         <div className="flex items-center gap-1 md:hidden ml-auto">
           <button
             onClick={() => { setSearchOpen(!searchOpen); setMobileOpen(false); setTimeout(() => searchInputRef.current?.focus(), 50); }}
@@ -259,6 +294,19 @@ export function Navbar() {
           >
             {searchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
           </button>
+
+          {/* Profile avatar — mobile only */}
+          {user && (
+            <Link to="/profile" className="flex h-9 w-9 items-center justify-center">
+              <Avatar className="h-8 w-8 ring-2 ring-transparent hover:ring-primary/30 transition-all">
+                <AvatarImage src={profile?.avatar_url} />
+                <AvatarFallback className="bg-primary text-primary-foreground text-xs font-bold">
+                  {profile?.full_name?.[0] || user.email?.[0]?.toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+            </Link>
+          )}
+
           <button
             onClick={() => { setMobileOpen(!mobileOpen); setSearchOpen(false); }}
             className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
@@ -307,6 +355,20 @@ export function Navbar() {
                 </button>
               </Link>
             ))}
+            <button
+              onClick={() => { setMobileOpen(false); document.getElementById("leaderboard")?.scrollIntoView({ behavior: "smooth" }); navigate("/"); }}
+              className="w-full rounded-xl px-4 py-2.5 text-left text-sm font-medium text-foreground hover:bg-muted transition-colors flex items-center gap-2"
+            >
+              <Trophy className="h-4 w-4 text-yellow-500" /> Leaderboard
+            </button>
+            {canInstall && (
+              <button
+                onClick={() => { setMobileOpen(false); handleInstall(); }}
+                className="w-full rounded-xl px-4 py-2.5 text-left text-sm font-medium text-primary hover:bg-primary/10 transition-colors flex items-center gap-2"
+              >
+                <Download className="h-4 w-4" /> Install App
+              </button>
+            )}
             {isAdmin && (
               <Link to="/admin" onClick={() => setMobileOpen(false)}>
                 <button className="w-full rounded-xl px-4 py-2.5 text-left text-sm font-medium text-primary hover:bg-primary/10 transition-colors">

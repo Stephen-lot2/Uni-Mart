@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { Wallet as WalletIcon, ArrowDownCircle, ArrowUpCircle, Clock, Loader2, Plus } from "lucide-react";
+import { Wallet as WalletIcon, ArrowDownCircle, ArrowUpCircle, Clock, Loader2, Plus, ArrowLeft } from "lucide-react";
 
 const statusColors: Record<string, string> = {
   pending: "bg-secondary text-secondary-foreground",
@@ -114,11 +114,15 @@ const Wallet = () => {
   return (
     <PageTransition>
       <div className="container mx-auto max-w-2xl px-4 py-8">
-        <div className="flex items-center gap-2">
-          <WalletIcon className="h-6 w-6 text-primary" />
-          <h1 className="font-display text-3xl font-bold">My Wallet</h1>
+        <div className="flex items-center gap-3">
+          <button onClick={() => navigate(-1)} className="flex h-9 w-9 items-center justify-center rounded-full border bg-card shadow-sm hover:bg-muted transition-colors">
+            <ArrowLeft className="h-4 w-4" />
+          </button>
+          <div>
+            <h1 className="font-display text-2xl font-bold">My Wallet</h1>
+            <p className="text-sm text-muted-foreground">Deposit, spend, and withdraw your funds</p>
+          </div>
         </div>
-        <p className="mt-1 text-muted-foreground">Deposit, spend, and withdraw your funds</p>
 
         {/* Balance Card */}
         <div className="mt-6 overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-primary/80 p-6 text-primary-foreground shadow-lg">

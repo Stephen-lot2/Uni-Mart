@@ -4,7 +4,7 @@ import { useAuthStore } from "@/lib/store";
 import { ListingCard } from "@/components/ListingCard";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Heart } from "lucide-react";
+import { Heart, ArrowLeft } from "lucide-react";
 import { SkeletonGrid } from "@/components/PageLoader";
 import { PageTransition } from "@/components/PageTransition";
 
@@ -35,11 +35,15 @@ const Favorites = () => {
   return (
     <PageTransition>
     <div className="container mx-auto px-4 py-8">
-      <div className="flex items-center gap-2">
-        <Heart className="h-6 w-6 text-destructive" />
-        <h1 className="font-display text-3xl font-bold">Favorites</h1>
+      <div className="flex items-center gap-3">
+        <button onClick={() => navigate(-1)} className="flex h-9 w-9 items-center justify-center rounded-full border bg-card shadow-sm hover:bg-muted transition-colors">
+          <ArrowLeft className="h-4 w-4" />
+        </button>
+        <div>
+          <h1 className="font-display text-2xl font-bold">Favorites</h1>
+          <p className="text-sm text-muted-foreground">Items you've saved for later</p>
+        </div>
       </div>
-      <p className="mt-1 text-muted-foreground">Items you've saved for later</p>
 
       {isLoading ? (
         <div className="mt-8">

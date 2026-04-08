@@ -11,7 +11,7 @@ import { CATEGORIES, CONDITIONS } from "@/lib/constants";
 import { compressToBase64 } from "@/lib/imageUpload";
 import { PageTransition } from "@/components/PageTransition";
 import { toast } from "sonner";
-import { ImagePlus, X, Loader2 } from "lucide-react";
+import { ImagePlus, X, Loader2, ArrowLeft } from "lucide-react";
 
 const CreateListing = () => {
   const navigate = useNavigate();
@@ -86,8 +86,15 @@ const CreateListing = () => {
   return (
     <PageTransition>
     <div className="container mx-auto max-w-lg px-4 py-8">
-      <h1 className="font-display text-3xl font-bold">Create Listing</h1>
-      <p className="mt-1 text-muted-foreground">Post an item or service for sale</p>
+      <div className="flex items-center gap-3">
+        <button onClick={() => navigate(-1)} className="flex h-9 w-9 items-center justify-center rounded-full border bg-card shadow-sm hover:bg-muted transition-colors">
+          <ArrowLeft className="h-4 w-4" />
+        </button>
+        <div>
+          <h1 className="font-display text-2xl font-bold">Create Listing</h1>
+          <p className="text-sm text-muted-foreground">Post an item or service for sale</p>
+        </div>
+      </div>
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-5">
         {/* Images */}
@@ -95,12 +102,12 @@ const CreateListing = () => {
           <Label>Photos <span className="text-muted-foreground text-xs">(max 4)</span></Label>
           <div className="mt-2 flex flex-wrap gap-3">
             {images.map((img, i) => (
-              <div key={i} className="relative h-20 w-20 overflow-hidden rounded-lg border">
+              <div key={i} className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border bg-muted">
                 <img src={img} alt="" className="h-full w-full object-cover" />
                 <button
                   type="button"
                   onClick={() => setImages((p) => p.filter((_, j) => j !== i))}
-                  className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-destructive-foreground"
+                  className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-destructive-foreground shadow"
                 >
                   <X className="h-3 w-3" />
                 </button>

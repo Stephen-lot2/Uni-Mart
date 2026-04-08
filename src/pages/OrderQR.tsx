@@ -53,7 +53,7 @@ const OrderQR = () => {
     ctx.fillStyle = "#ffffff";
     ctx.font = "bold 22px sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText("UniMart", W / 2, 42);
+    ctx.fillText("CampusMart", W / 2, 42);
     ctx.font = "14px sans-serif";
     ctx.fillStyle = "rgba(255,255,255,0.8)";
     ctx.fillText("Delivery QR Code", W / 2, 68);
@@ -120,7 +120,7 @@ const OrderQR = () => {
 
     // Download
     const link = document.createElement("a");
-    link.download = `unimart-order-${order.id.slice(0, 8)}.png`;
+    link.download = `CampusMart-order-${order.id.slice(0, 8)}.png`;
     link.href = canvas.toDataURL("image/png");
     link.click();
     toast.success("QR card downloaded");
@@ -215,3 +215,4 @@ const OrderQR = () => {
 };
 
 export default OrderQR;
+

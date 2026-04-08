@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,6 +34,7 @@ const slide = {
 
 export default function Register() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [step, setStep] = useState(1);
   const [dir, setDir] = useState(1);
 
@@ -155,7 +156,8 @@ export default function Register() {
     if (password.length < 6) { toast.error("Password must be at least 6 characters"); return; }
     setCreating(true);
     try {
-      const { error } = await supabase.auth.updateUser({
+      // 1. Set password + user metadata
+      const { data: userData, error: updateError } = await supabase.auth.updateUser({
         password,
         data: {
           full_name: fullName.trim(),
@@ -168,7 +170,46 @@ export default function Register() {
           phone: phone.trim() || null,
         },
       });
-      if (error) throw error;
+      if (updateError) throw updateError;
+
+      const uid = userData.user?.id;
+      if (!uid) throw new Error("Could not get user ID");
+
+      // 2. Upsert profile row directly (in case the DB trigger hasn't run yet)
+      const { error: profileError } = await supabase.from("profiles").upsert({
+        user_id: uid,
+        full_name: fullName.trim(),
+        username: username.trim().toLowerCase(),
+        bio: null,
+        department: department || null,
+        level: level ? parseInt(level) : null,
+      }, { onConflict: "user_id" });
+
+      if (profileError) {
+        if (profileError.code === "23505") {
+          toast.error("That username is already taken, try another");
+          setCreating(false);
+          return;
+        }
+        throw profileError;
+      }
+
+      // 3. Apply referral code if present in URL
+      const refCode = searchParams.get("ref");
+      if (refCode) {
+        const { data: referrer } = await supabase
+          .from("profiles").select("user_id").eq("username", refCode.toLowerCase()).maybeSingle();
+        if (referrer && referrer.user_id !== uid) {
+          await supabase.from("referrals").insert({ referrer_id: referrer.user_id, referred_id: uid }).then(() => {});
+          // Credit both wallets ₦200
+          const credit = async (userId: string) => {
+            const { data: w } = await supabase.from("seller_wallets").select("balance").eq("user_id", userId).single();
+            await supabase.from("seller_wallets").upsert({ user_id: userId, balance: Number(w?.balance || 0) + 200 }, { onConflict: "user_id" });
+          };
+          await Promise.all([credit(uid), credit(referrer.user_id)]);
+        }
+      }
+
       go(5);
     } catch (err: any) {
       toast.error(err.message || "Failed to create account");
@@ -231,7 +272,7 @@ export default function Register() {
               {step === 1 && (
                 <motion.div key="s1" custom={dir} variants={slide} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.28 }}>
                   <div className="mb-7 text-center">
-                    <h1 className="font-display text-2xl font-bold">Welcome to UniMart</h1>
+                    <h1 className="font-display text-2xl font-bold">Welcome to CampusMart</h1>
                     <p className="mt-1 text-sm text-muted-foreground">Campus marketplace for verified students</p>
                   </div>
                   <p className="mb-4 text-center text-sm font-semibold">Are you a student?</p>
@@ -505,7 +546,7 @@ export default function Register() {
                     </motion.div>
                     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
                       <h2 className="mt-5 font-display text-2xl font-bold">Account Created!</h2>
-                      <p className="mt-1 text-muted-foreground text-sm">Welcome to UniMart 🎉</p>
+                      <p className="mt-1 text-muted-foreground text-sm">Welcome to CampusMart 🎉</p>
                       {isStudent && (
                         <div className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-semibold text-primary">
                           <CheckCircle2 className="h-3.5 w-3.5" /> Verified Student ✅
@@ -533,7 +574,7 @@ export default function Register() {
 
         {step === 1 && (
           <p className="mt-6 text-center text-xs text-muted-foreground">
-            By continuing, you agree to UniMart's{" "}
+            By continuing, you agree to CampusMart's{" "}
             <span className="cursor-pointer text-primary hover:underline">Terms</span> &{" "}
             <span className="cursor-pointer text-primary hover:underline">Privacy Policy</span>
           </p>
@@ -542,3 +583,4 @@ export default function Register() {
     </div>
   );
 }
+
