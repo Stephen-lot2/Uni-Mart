@@ -172,6 +172,7 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
         <BrowserRouter>
           <AuthProvider>
             <NotificationManager />
@@ -185,8 +186,6 @@ const App = () => {
             </div>
           </AuthProvider>
         </BrowserRouter>
-        {/* Splash renders on top but app loads underneath — no blocking */}
-        {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
       </TooltipProvider>
     </QueryClientProvider>
   );

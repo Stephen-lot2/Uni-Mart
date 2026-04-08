@@ -28,7 +28,7 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
               transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.2 }}
               className="flex h-20 w-20 items-center justify-center rounded-2xl bg-primary-foreground shadow-2xl"
             >
-              <span className="font-display text-4xl font-bold text-primary">U</span>
+              <span className="font-display text-4xl font-bold text-primary">C</span>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
